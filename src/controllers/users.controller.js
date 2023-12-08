@@ -1,13 +1,37 @@
 import {pool} from '../database.js'
 
 export const getUsers = async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT * FROM user')
-        res.json(rows)
-    } catch(error) {
-        return res.status(500).json( {
-            message: 'Something went wrong'
-        })
+    if (req.query.email && req.query.password) {
+        const { email, password } = req.query
+        try {
+            const [rows] = await pool.query('SELECT * FROM user WHERE email=?', [email])
+            if (rows.length <= 0) return res.status(404).json({
+                message : 'User not found'
+            })
+            if (password === rows[0].password) {
+                    res.status(200).json({
+                        message: 'Authentication successful.',
+                        userId: rows[0].id
+                    }) 
+            } else {
+                res.status(401).json({
+                    message: 'Incorrect password.'
+                })
+            }
+        } catch (error) {
+            return res.status(500).json( {
+                message: 'Something went wrong'
+            })
+        }
+    } else {
+        try {
+            const [rows] = await pool.query('SELECT * FROM user')
+            res.json(rows)
+        } catch(error) {
+            return res.status(500).json( {
+                message: 'Something went wrong'
+            })
+        }
     }
 }
 
@@ -72,6 +96,20 @@ export const updateUser = async (req, res) => {
         const [rows] = await pool.query('SELECT * FROM user WHERE id = ?', [id])
 
         res.json(rows[0])
+    } catch (error) {
+        return res.status(500).json( {
+            message: 'Something went wrong'
+        })
+    }
+}
+
+
+export const getUserTeams = async (req, res) => {
+    const {id} = req.params
+
+    try {
+        const [rows] = await pool.query('SELECT * FROM member WHERE user_id = ?', [id])
+        res.json(rows);
     } catch (error) {
         return res.status(500).json( {
             message: 'Something went wrong'
