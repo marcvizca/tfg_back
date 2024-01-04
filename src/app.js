@@ -6,6 +6,7 @@ import registerRoutes from './routes/register.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import logoutRoutes from './routes/logout.routes.js'
 import refreshRoutes from './routes/refreshToken.routes.js'
+import recoveryRoutes from './routes/recovery.routes.js'
 import teamsRoutes from './routes/teams.routes.js'
 import membersRoutes from './routes/members.routes.js'
 import minutsRoutes from './routes/minuts.routes.js'
@@ -14,7 +15,7 @@ import verifyJWT from './middleware/verifyJWT.js'
 import cookieParser from 'cookie-parser'
 
 
-const app = express() //iniciamos express
+const app = express();
 const corsOptions = {
     origin:'http://localhost:3000', 
     credentials:true,
@@ -28,6 +29,7 @@ app.use('/api', registerRoutes);
 app.use('/api', authRoutes);
 app.use('/api', logoutRoutes);
 app.use('/api', refreshRoutes);
+app.use('/api', recoveryRoutes);
 //app.use(verifyJWT);
 app.use('/api', usersRoutes);
 app.use('/api', pollsRoutes);

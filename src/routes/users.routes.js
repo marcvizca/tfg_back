@@ -12,7 +12,7 @@ router.post('/user', createUser)
 
 router.delete('/user/:id', deleteUser)
 
-router.put('/user/:id', updateUser) //valorar si fer patch enlloc de put
+router.put('/user/:id', updateUser) 
 
 router.get('/user/:id/teams', getUserTeams)
 

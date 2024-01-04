@@ -1,11 +1,15 @@
 import {pool} from '../database.js'
+//import {format} from 'date-fns-tz'
+//import dateFnsTz from 'date-fns-tz';
 
-const postPoll = async (user_id, team_id) => {
-    var date = new Date();
+const postPoll = async (user_id, team_id, date) => {
+    /*var date = new Date();
     var dd = String(date.getDate()).padStart(2, '0');
     var mm = String (date.getMonth() +1).padStart(2, '0');
     var yyyy = date.getFullYear();
-    date = yyyy + '-' + mm + '-' + dd;
+    date = yyyy + '-' + mm + '-' + dd;*/
+    //const date = formatInTimeZone(new Date(), 'Europe/Madrid', 'yyyy-MM-dd');
+    //const date = format(new Date(), 'yyyy-MM-dd', { timeZone: 'Europe/Madrid' });
     try {
         const [rows] = await pool.query('INSERT INTO poll (user_id, team_id, date) VALUES (?, ?, ?)', [user_id, team_id, date])
         return rows.insertId;
@@ -15,9 +19,9 @@ const postPoll = async (user_id, team_id) => {
 }
 
 export const postRpe = async (req, res) => {
-    const { userId, teamId, rpe } = req.body;
+    const { userId, teamId, date, rpe } = req.body;
     try {
-        const result = await postPoll(userId, teamId);
+        const result = await postPoll(userId, teamId, date);
         const [rows] = await pool.query('INSERT INTO rpe (poll_id, rpe) VALUES (?, ?)', [result, rpe])
         res.status(201).json ({
             success: 'Rpe answered succesfully!'
@@ -30,9 +34,9 @@ export const postRpe = async (req, res) => {
 }
 
 export const postWellness = async (req, res) => {
-    const { user_id, team_id, data } = req.body
+    const { userId, teamId, date, data } = req.body
     try {
-        const result = await postPoll(user_id, team_id);
+        const result = await postPoll(userId, teamId, date);
         const [rows] = await pool.query('INSERT INTO wellness (poll_id, sleep, stress, fatigue, pain, mood) VALUES (?, ?, ?, ?, ?, ?)', [result, data.sleep, data.stress, data.fatigue, data.pain, data.mood])
         res.status(201).json ({
             success: 'Wellness answered succesfully!'
@@ -75,9 +79,10 @@ export const getRpeByUser = async(req, res) => {
     const {userId, teamId, fromDate, toDate} = req.params;
     try {
         const result = await pool.query(
-            'SELECT P.date, R.rpe FROM Rpe R JOIN Poll P ON R.poll_id = P.id JOIN Member M ON P.user_id = M.user_id AND P.team_id = M.team_id WHERE P.user_id = ? AND P.team_id = ? AND P.date BETWEEN ? AND ?',[userId, teamId, fromDate, toDate]);
+            `SELECT CONVERT_TZ(P.date, '+00:00', '+01:00') AS date, R.rpe FROM Rpe R JOIN Poll P ON R.poll_id = P.id JOIN Member M ON P.user_id = M.user_id AND P.team_id = M.team_id WHERE P.user_id = ? AND P.team_id = ? AND P.date BETWEEN ? AND ? ORDER BY P.date`,[userId, teamId, fromDate, toDate]);
         res.json(result[0]);
     } catch (error) {
+        console.log(error);
         return res.status(500).json( {
             message: 'Something went wrong'
         })
@@ -88,8 +93,7 @@ export const getWellnessByUser = async (req, res) => {
     const {userId, teamId, fromDate, toDate} = req.params;
     try {
         const result = await pool.query(
-            'SELECT P.date, W.sleep, W.stress, W.fatigue, W.pain, W.mood FROM Wellness W JOIN Poll P ON W.poll_id = P.id JOIN Member M ON P.user_id = M.user_id AND P.team_id = M.team_id WHERE P.user_id = ? AND P.team_id = ? AND P.date BETWEEN ? AND ?',[userId, teamId, fromDate, toDate]);
-            console.log(result[0])
+            `SELECT CONVERT_TZ(P.date, '+00:00', '+01:00') AS date, W.sleep, W.stress, W.fatigue, W.pain, W.mood FROM Wellness W JOIN Poll P ON W.poll_id = P.id JOIN Member M ON P.user_id = M.user_id AND P.team_id = M.team_id WHERE P.user_id = ? AND P.team_id = ? AND P.date BETWEEN ? AND ? ORDER BY P.date`,[userId, teamId, fromDate, toDate]);
         res.json(result[0]);
     } catch (error) {
         return res.status(500).json( {

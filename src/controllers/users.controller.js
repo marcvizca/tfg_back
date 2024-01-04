@@ -85,9 +85,21 @@ export const deleteUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const {id} = req.params
-    const { email, password, name, surname } = req.body
+    const {name, surname } = req.body
+    let updateData = [];
+    let updateParams=[];
+    if (name) {
+        updateData.push('name = ?');
+        updateParams.push(name);
+    }
+    if (surname) {
+        updateData.push('surname = ?');
+        updateParams.push(surname);
+    }
+    console.log(updateParams, updateData);
     try {
-        const [result] = await pool.query('UPDATE user SET email = ?, password = ?, name = ?, surname = ? WHERE id = ?', [email, password, name, surname, id])
+        const updateQuery = 'UPDATE user SET ' + updateData.join(', ') + ' WHERE id = ?';
+        const [result] = await pool.query(updateQuery, [...updateParams, id]);
 
         if (result.affectedRows === 0) return res.status(404).json({
             "message": "User not found"
@@ -108,7 +120,11 @@ export const getUserTeams = async (req, res) => {
     const {id} = req.params
 
     try {
-        const [rows] = await pool.query('SELECT * FROM member WHERE user_id = ?', [id])
+        const [rows] = await pool.query('SELECT * FROM member WHERE user_id = ?', [id]);
+        if (rows.length === 0) {
+            return res.json({ message: 'No formas parte de ningún equipo.' });
+        }
+
         res.json(rows);
     } catch (error) {
         return res.status(500).json( {

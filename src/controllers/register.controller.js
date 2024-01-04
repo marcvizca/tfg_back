@@ -23,3 +23,17 @@ export const registerUser = async (req, res) => {
         })
     }
 }
+
+export const changePassword = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const hashedPwd = await bcrypt.hash(password, 10);
+        const [rows] = await pool.query('UPDATE user SET password = ? WHERE email = ?', [hashedPwd, email]);
+        res.status(201).json({ message: 'Password changed correctly!' })
+    }
+    catch (error) {
+        res.status(500).json( {
+            message: 'Something went wrong'
+        })
+    }
+}

@@ -20,9 +20,9 @@ export const getTeam = async (req, res) => {
 }
 
 export const postTeam = async (req, res) => {
-    const { userId, name, sport } = req.body
+    const { userId, teamName, sport } = req.body
     try {
-        const [result] = await pool.query('INSERT INTO team (name, sport) VALUES (?, ?)', [name, sport])
+        const [result] = await pool.query('INSERT INTO team (name, sport) VALUES (?, ?)', [teamName, sport])
         const teamId = result.insertId;
         await pool.query('INSERT INTO member (user_id, team_id, is_trainer) VALUES (?, ?, ?)', [userId, teamId, true])
         res.status(201).json ({
