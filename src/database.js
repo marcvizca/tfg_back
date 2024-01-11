@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 
 
 dotenv.config()
+console.log("host", process.env.MYSQL_HOST);
 
 //var path = require('path');
 //const __filename = new URL(import.meta.url).pathname;
