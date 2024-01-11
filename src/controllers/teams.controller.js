@@ -41,8 +41,10 @@ export const joinTeam = async (req, res) => {
 
     try {
         const teamResult = await pool.query('SELECT * FROM team WHERE id = ?', [teamId]);
+        console.log(teamResult[0]);
 
-        if (teamResult[0]) {
+        if (teamResult[0] != '') {
+            console.log("entra if");
             try {
                 await pool.query('INSERT INTO MemberPendent (user_id, team_id, number, position) VALUES (?, ?, ?, ?)',
                 [userId, teamId, number, position]);
@@ -52,6 +54,7 @@ export const joinTeam = async (req, res) => {
                 else return res.status(500).json({ error: 'Something went wrong '})
             }
         } else {
+            console.log("Entra else")
             return res.status(404).json({ error: 'Team not found' });
         }
     } catch (error) {
