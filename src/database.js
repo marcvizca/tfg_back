@@ -20,5 +20,6 @@ pool.getConnection()
     connection.release();
   })
   .catch(error => {
+    console.log(process.env.MYSQL_HOST)
     console.error('Error connecting to database:', error);
   });
