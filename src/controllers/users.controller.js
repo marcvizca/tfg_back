@@ -96,7 +96,6 @@ export const updateUser = async (req, res) => {
         updateData.push('surname = ?');
         updateParams.push(surname);
     }
-    console.log(updateParams, updateData);
     try {
         const updateQuery = 'UPDATE user SET ' + updateData.join(', ') + ' WHERE id = ?';
         const [result] = await pool.query(updateQuery, [...updateParams, id]);

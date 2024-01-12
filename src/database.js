@@ -13,13 +13,3 @@ export const pool = createPool(
         ssl: {ca: fs.readFileSync('./src/DigiCertGlobalRootCA.crt.pem')}
     }
 );
-
-pool.getConnection()
-  .then(connection => {
-    console.log('Connected to database!');
-    connection.release();
-  })
-  .catch(error => {
-    console.log(process.env.MYSQL_HOST)
-    console.error('Error connecting to database:', error);
-  });
