@@ -82,7 +82,6 @@ export const getRpeByUser = async(req, res) => {
             `SELECT CONVERT_TZ(P.date, '+00:00', '+01:00') AS date, R.rpe FROM Rpe R JOIN Poll P ON R.poll_id = P.id JOIN Member M ON P.user_id = M.user_id AND P.team_id = M.team_id WHERE P.user_id = ? AND P.team_id = ? AND P.date BETWEEN ? AND ? ORDER BY P.date`,[userId, teamId, fromDate, toDate]);
         res.json(result[0]);
     } catch (error) {
-        console.log(error);
         return res.status(500).json( {
             message: 'Something went wrong'
         })
