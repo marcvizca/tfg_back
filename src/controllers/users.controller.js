@@ -42,7 +42,7 @@ export const getUser = async (req, res) => {
         message : 'User not found'
         })
 
-        res.json(rows[0])
+        res.json({"email": rows[0].email, "name": rows[0].name, "surname": rows[0].surname});
     } catch (error) {
         return res.status(500).json( {
             message: 'Something went wrong'
