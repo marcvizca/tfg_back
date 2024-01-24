@@ -65,7 +65,8 @@ export const getWellnessInfo = async(req, res) => {
     const {teamId, date} = req.params;
     try {
         const result = await pool.query(
-            'SELECT DISTINCT U.id, M.number, U.name, U.surname, W.sleep, W.stress, W.fatigue, W.pain, W.mood FROM Member M JOIN User U ON M.user_id = U.id LEFT JOIN Poll P ON M.user_id = P.user_id AND M.team_id = P.team_id AND P.date = ? LEFT JOIN Wellness W ON P.id = W.poll_id WHERE M.team_id = ? AND M.is_trainer = 0 ORDER BY M.number', [date, teamId]);
+            'SELECT DISTINCT U.id, M.number, U.name, U.surname, MAX(W.sleep) AS sleep, MAX(W.stress) AS stress, MAX(W.fatigue) AS fatigue, MAX(W.pain) AS pain, MAX(W.mood) AS mood FROM Member M JOIN User U ON M.user_id = U.id LEFT JOIN Poll P ON M.user_id = P.user_id AND M.team_id = P.team_id AND P.date = ? LEFT JOIN Wellness W ON P.id = W.poll_id WHERE M.team_id = ? AND M.is_trainer = 0 GROUP BY M.number, U.name, U.surname, U.id ORDER BY M.number', [date, teamId]);
+            console.log(result[0])
         res.json(result[0]);
     } catch (error) {
         return res.status(500).json( {
